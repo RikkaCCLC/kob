@@ -35,4 +35,8 @@ export default { //这个写法是固定的
 </script>
 
 <style>
+body{
+  background-image: url("@/assets/background.png");
+  background-size: cover;
+}
 </style>

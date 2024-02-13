@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cf2945e2-bdf2-4271-811e-ccb3ee0729d0" name="变更" comment="">
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/kob/backend/controller/pk/BotInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/kob/backend/controller/pk/BotInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/components/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/views/AboutView.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/views/HomeView.vue" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +70,7 @@
       <updated>1707184544323</updated>
       <workItem from="1707184546628" duration="5050000" />
       <workItem from="1707278545930" duration="1403000" />
+      <workItem from="1707796178959" duration="710000" />
     </task>
     <servers />
   </component>
