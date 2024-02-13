@@ -1,24 +1,25 @@
-import { AcGameObject } from "./AcGameObject"; //把这个基类导入
+import { AcGameObject } from "./AcGameObject";
 import { Wall } from "./Wall";
-//import时如果import的是export的内容，需要用括号括起来
-//如果是export default的内容，则不需要用括号括起来
-//每一个文件最多只能有一个export default，这个export default就类似于Java里的public class
+import { Snake } from './Snake';
 
-export class GameMap extends AcGameObject { //定义地图类并将其export出去
-    constructor(ctx, parent) { //构造函数里需要传两个参数，ctx是画布
-        //前端游戏所有的东西都是在画布里面画
-        //第二个是画布的父元素，用来动态渲染画布的长宽
+export class GameMap extends AcGameObject {
+    constructor(ctx, parent) {
+        super();
 
-        super(); //构造函数中一定要先执行基类的构造函数
         this.ctx = ctx;
         this.parent = parent;
-        this.L = 0; //存储绝对距离，代表一个单位的长度，未来地图长度直接使用此单位
+        this.L = 0;
 
-        this.rows = 13; //绝对距离的行数
-        this.cols = 13; //绝对距离的列数
-
+        this.rows = 13;
+        this.cols = 14;
+        
         this.inner_walls_count = 20;
-        this.walls = []; //创建一个数组用来存储所有的墙
+        this.walls = [];
+
+        this.snakes = [
+            new Snake({id: 0, color: "#4876EC", r: this.rows - 2, c: 1}, this),
+            new Snake({id: 1, color: "#F94848", r: 1, c: this.cols - 2}, this),
+        ];
     }
 
     check_connectivity(g, sx, sy, tx, ty) {
@@ -58,11 +59,11 @@ export class GameMap extends AcGameObject { //定义地图类并将其export出�
             for (let j = 0; j < 1000; j ++ ) {
                 let r = parseInt(Math.random() * this.rows);
                 let c = parseInt(Math.random() * this.cols);
-                if (g[r][c] || g[c][r]) continue;
+                if (g[r][c] || g[this.rows - 1 - r][this.cols - 1 - c]) continue;
                 if (r == this.rows - 2 && c == 1 || r == 1 && c == this.cols - 2)
                     continue;
 
-                g[r][c] = g[c][r] = true;
+                g[r][c] = g[this.rows - 1 - r][this.cols - 1 - c] = true;
                 break;
             }
         }
@@ -82,33 +83,79 @@ export class GameMap extends AcGameObject { //定义地图类并将其export出�
         return true;
     }
 
-    start(){
-        for (let i = 0; i < 1000; i ++ ) 
-        if (this.create_walls())
-            break;
+    add_listening_events() {
+        this.ctx.canvas.focus();
+
+        const [snake0, snake1] = this.snakes;
+        this.ctx.canvas.addEventListener("keydown", e => {
+            if (e.key === 'w') snake0.set_direction(0);
+            else if (e.key === 'd') snake0.set_direction(1);
+            else if (e.key === 's') snake0.set_direction(2);
+            else if (e.key === 'a') snake0.set_direction(3);
+            else if (e.key === 'ArrowUp') snake1.set_direction(0);
+            else if (e.key === 'ArrowRight') snake1.set_direction(1);
+            else if (e.key === 'ArrowDown') snake1.set_direction(2);
+            else if (e.key === 'ArrowLeft') snake1.set_direction(3);
+        });
     }
 
-    //因为浏览器框可以缩放，所以地图长度必须实时更新
-    update_size() { //更新地图长度函数
-        this.L = Math.min(this.parent.clientWidth / this.cols, this.parent.clientHeight / this.rows)
-        //游戏区域是一个在浏览器中的正方形区域。边长取浏览器宽和高的最小值
-        //clientWidth和clientHeight是求div的长宽，这是一个api，想详细了解自行百度即可
+    start() {
+        for (let i = 0; i < 1000; i ++ ) 
+            if (this.create_walls())
+                break;
+        
+        this.add_listening_events();
+    }
 
-        //求完小正方形的边长之后，就可以计算canvas的长宽
+    update_size() {
+        this.L = parseInt(Math.min(this.parent.clientWidth / this.cols, this.parent.clientHeight / this.rows));
         this.ctx.canvas.width = this.L * this.cols;
         this.ctx.canvas.height = this.L * this.rows;
-        //求完之后可以去render中将地图画出来
-
     }
 
-    update() { //每一帧执行一次，除了第一帧之外
-        this.update_size(); //每一帧都更新长度
+    check_ready() {  // 判断两条蛇是否都准备好下一回合了
+        for (const snake of this.snakes) {
+            if (snake.status !== "idle") return false;
+            if (snake.direction === -1) return false;
+        }
+        return true;
+    }
+
+    next_step() {  // 让两条蛇进入下一回合
+        for (const snake of this.snakes) {
+            snake.next_step();
+        }
+    }
+
+    check_valid(cell) {  // 检测目标位置是否合法：没有撞到两条蛇的身体和障碍物
+        for (const wall of this.walls) {
+            if (wall.r === cell.r && wall.c === cell.c)
+                return false;
+        }
+
+        for (const snake of this.snakes) {
+            let k = snake.cells.length;
+            if (!snake.check_tail_increasing()) {  // 当蛇尾会前进的时候，蛇尾不要判断
+                k -- ;
+            }
+            for (let i = 0; i < k; i ++ ) {
+                if (snake.cells[i].r === cell.r && snake.cells[i].c === cell.c)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    update() {
+        this.update_size();
+        if (this.check_ready()) {
+            this.next_step();
+        }
         this.render();
     }
 
-    render() { //每一帧执行一次，实现地图渲染
-        //画地图函数直接去mdn中查api粘过来即可
-        //奇数格和偶数格用不同的颜色
+    render() {
         const color_even = "#AAD751", color_odd = "#A2D149";
         for (let r = 0; r < this.rows; r ++ ) {
             for (let c = 0; c < this.cols; c ++ ) {

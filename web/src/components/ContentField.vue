@@ -1,6 +1,3 @@
-<!-- 公共白框组件 -->
-
-
 <template>
     <div class="container content-field">
         <div class="card">
@@ -9,11 +6,9 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
-
 </script>
 
 <style scoped>

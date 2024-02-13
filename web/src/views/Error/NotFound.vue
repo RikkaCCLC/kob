@@ -1,24 +1,18 @@
-<!-- 404主页面 -->
-
 <template>
     <ContentField>
-        404 NOT FOUND
+        404 Not Found
     </ContentField>
-    
-    </template>
-    
-    <script>
-    import ContentField from '@/components/ContentField'
-    
-    export default {
-      components: { ContentField },
-        component: {
-            ContentField
-        } 
-    } 
-    
-    </script>
-    
-    <style scoped>
-    
-    </style>
+</template>
+
+<script>
+import ContentField from '../../components/ContentField.vue'
+
+export default {
+    components: {
+        ContentField
+    }
+}
+</script>
+
+<style scoped>
+</style>
